@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Server Panel</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <h1>Server Panel</h1>
+  <form id="run-script-form">
+    <label for="script-name">Script Name:</label>
+    <input type="text" id="script-name" name="script-name"><br><br>
+    <button type="submit">Run Script</button>
+  </form>
+
+  <form id="schedule-script-form">
+    <label for="script-name">Script Name:</label>
+    <input type="text" id="script-name" name="script-name"><br><br>
+    <label for="interval">Interval (seconds):</label>
+    <input type="number" id="interval" name="interval"><br><br>
+    <button type="submit">Schedule Script</button>
+  </form>
+
+  <div id="output"></div>
+
+  <script>
+    const runScriptForm = document.getElementById('run-script-form');
+    const scheduleScriptForm = document.getElementById('schedule-script-form');
+    const outputDiv = document.getElementById('output');
+
+    runScriptForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const scriptName = document.getElementById('script-name').value;
+      fetch('/run_script', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ script_name: scriptName })
+      })
+      .then(response => response.json())
+      .then(data => {
+        outputDiv.innerHTML = `Script ${scriptName} run successfully`;
+      })
+      .catch(error => {
+        outputDiv.innerHTML = `Error: ${error.message}`;
+      });
+    });
+
+    scheduleScriptForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const scriptName = document.getElementById('script-name').value;
+      const interval = document.getElementById('interval').value;
+      fetch('/schedule_script', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ script_name: scriptName, interval: interval })
+      })
+      .then(response => response.json())
+      .then(data => {
+        outputDiv.innerHTML = `Script ${scriptName} scheduled to run every ${interval} seconds`;
+      })
+      .catch(error => {
+        outputDiv.innerHTML = `Error: ${error.message}`;
+      });
+    });
+  </script>
+</body>
+</html>
